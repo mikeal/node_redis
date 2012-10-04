@@ -1592,6 +1592,21 @@ tests.auth = function () {
     });
 };
 
+tests.domain = function () {
+    var name = "DOMAIN";
+    var domain = require('domain').create();
+    domain.run(function () {
+        client.set('domain1', 'value', function (e, i) {
+            console.error('throwing')
+            throw new Error('test domain');
+        })
+    })
+    domain.on('error', function (err) {
+        console.error('domain error')
+        next(name);
+    })
+}
+
 all_tests = Object.keys(tests);
 all_start = new Date();
 test_count = 0;

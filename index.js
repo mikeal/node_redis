@@ -516,6 +516,7 @@ RedisClient.prototype.return_error = function (err) {
 // if a callback throws an exception, re-throw it on a new stack so the parser can keep going.
 // put this try/catch in its own function because V8 doesn't optimize this well yet.
 function try_callback(callback, reply) {
+    if (callback.domain) return callback(null, reply);
     try {
         callback(null, reply);
     } catch (err) {
@@ -641,6 +642,7 @@ function Command(command, args, sub_command, buffer_args, callback) {
     this.sub_command = sub_command;
     this.buffer_args = buffer_args;
     this.callback = callback;
+    if (process.domain) this.callback = process.domain.bind(this.callback)
 }
 
 RedisClient.prototype.send_command = function (command, args, callback) {
